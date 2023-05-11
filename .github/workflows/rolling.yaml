@@ -43,9 +43,9 @@ jobs:
       - name: Build iso
         working-directory: vyos-build
         run: |
-          docker run --rm --privileged -v $(pwd):/vyos -w /vyos vyos/vyos-build:equuleus bash -c \
-            sudo make clean \
-            sudo ./build-vyos-image iso \
+          docker run --rm --privileged -v $(pwd):/vyos -w /vyos vyos/vyos-build:${{ env.VYOS_BRANCH }} bash -c \
+            make clean \
+            ./build-vyos-image iso \
               --architecture ${{ env.VYOS_ARCH }} \
               --build-by ${{ env.VYOS_BUILD_BY }} \
               --build-type ${{ env.VYOS_BUILD_TYPE }} \
