@@ -43,8 +43,8 @@ jobs:
       - name: Build iso
         working-directory: vyos-build
         run: |
-          docker run --rm --privileged -v $(pwd):/vyos -w /vyos vyos/vyos-build:${{ env.VYOS_BRANCH }} bash -c \
-            make clean \
+          docker run --rm -it --privileged -v $(pwd):/vyos -w /vyos vyos/vyos-build:${{ env.VYOS_BRANCH }} bash
+            make clean
             ./build-vyos-image iso \
               --architecture ${{ env.VYOS_ARCH }} \
               --build-by ${{ env.VYOS_BUILD_BY }} \
