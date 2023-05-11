@@ -11,8 +11,6 @@ on:
       - ".github/workflows/rolling.yaml"
 
 env:
-  VYOS_URL: https://github.com/vyos/vyos-build
-  VYOS_BRANCH: current
   VYOS_ARCH: amd64
   VYOS_BUILD_BY: 112913195+jarvis-plus-bot[bot]@users.noreply.github.com
   VYOS_BUILD_TYPE: release
@@ -27,17 +25,17 @@ jobs:
       contents: write
     container:
       image: vyos/vyos-build:current
-      options: --workdir /vyos --privileged
+      options: --privileged
     steps:
       - name: Setup variables
         id: vars
         run: |
           build_date=$(date +%Y%m%d%H%M)
           echo "tag-name=${{ env.VYOS_VERSION }}-${build_date}" >> "$GITHUB_OUTPUT"
-          echo "iso-name=${{ env.VYOS_VERSION }}-${build_date}-${{ env.VYOS_ARCH }}" >> "$GITHUB_OUTPUT"
+          echo "iso-name=vyos-${{ env.VYOS_VERSION }}-${build_date}-${{ env.VYOS_ARCH }}" >> "$GITHUB_OUTPUT"
 
       - name: Clone vyos-build
-        run: git clone -b ${{ env.VYOS_BRANCH }} --single-branch ${{ env.VYOS_URL }}
+        run: git clone -b current --single-branch https://github.com/vyos/vyos-build
 
       - name: Build ISO
         working-directory: vyos-build
@@ -66,7 +64,7 @@ jobs:
         with:
           token: "${{ steps.generate-token.outputs.token }}"
           tag: "v${{ steps.vars.outputs.tag-name }}"
-          artifacts: "./vyos-build/build/vyos-${{ steps.vars.outputs.iso-name }}.iso"
+          artifacts: "./vyos-build/build/${{ steps.vars.outputs.iso-name }}.iso"
           artifactErrorsFailBuild: true
           body: |
             Official VyOS Changelog:
