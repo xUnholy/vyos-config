@@ -25,6 +25,9 @@ jobs:
       # Need permission to write to the Releases tab.
       # https://github.com/ncipollo/release-action/issues/208.
       contents: write
+    container:
+      image: vyos/vyos-build:current
+      options: --workdir /vyos --privileged
     steps:
       - name: Setup variables
         id: vars
@@ -33,19 +36,14 @@ jobs:
           echo "tag-name=${{ env.VYOS_VERSION }}-${build_date}" >> "$GITHUB_OUTPUT"
           echo "iso-name=${{ env.VYOS_VERSION }}-${build_date}-${{ env.VYOS_ARCH }}" >> "$GITHUB_OUTPUT"
 
-      - name: Pull vyos-build docker image
-        run: |
-          docker pull vyos/vyos-build:${{ env.VYOS_BRANCH }}
-
       - name: Clone vyos-build
         run: git clone -b ${{ env.VYOS_BRANCH }} --single-branch ${{ env.VYOS_URL }}
 
-      - name: Build iso
+      - name: Build ISO
         working-directory: vyos-build
         run: |
-          docker run --rm -it --privileged -v $(pwd):/vyos -w /vyos vyos/vyos-build:${{ env.VYOS_BRANCH }} bash -c
-            make clean && \
-            ./build-vyos-image iso \
+          sudo make clean
+          sudo ./build-vyos-image iso \
               --architecture ${{ env.VYOS_ARCH }} \
               --build-by ${{ env.VYOS_BUILD_BY }} \
               --build-type ${{ env.VYOS_BUILD_TYPE }} \
